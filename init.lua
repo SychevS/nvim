@@ -13,4 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require("athene-grey.options")
 require("athene-grey.keymaps")
-require("lazy").setup("athene-grey.plugins")
+require("lazy").setup("athene-grey.plugins", {
+    change_detection = {
+        notify = false,
+    },
+})

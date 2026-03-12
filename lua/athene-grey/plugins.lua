@@ -19,18 +19,14 @@ return {
     {
         "derekwyatt/vim-fswitch",
         config = function()
-            -- Настройки для C++ (ищет в текущей папке, в ../include и соседней /include)
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "cpp", "c", "cc", "cxx" },
                 callback = function()
-                    -- Куда переключаться (расширения)
                     vim.b.fswitchdst = "h,hpp,hh,hxx"
-                    -- Где искать (текущая папка, папка выше, папка include рядом)
                     vim.b.fswitchlocs = ".,../include,../inc,../../include,include"
                 end
             })
 
-            -- Настройки для заголовков (ищет в /src или текущей папке)
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "h", "hpp", "hh" },
                 callback = function()
@@ -46,7 +42,7 @@ return {
     {
         "windwp/nvim-autopairs",
         event = "InsertEnter",
-        config = true -- эквивалентно require("nvim-autopairs").setup({})
+        config = true
     },
 
     {
@@ -54,13 +50,17 @@ return {
         config = function()
             require('lualine').setup({
                 options = {
-                    icons_enabled = false,      -- отключает иконки
-                    theme = 'auto', -- подстроится под вашу тему оформления
-                    component_separators = '|', -- простые разделители
-                    section_separators = '',    -- убирает треугольники
+                    icons_enabled = false,
+                    theme = 'auto',
+                    component_separators = '|',
+                    section_separators = '',
                 }
             })
         end
+    },
+
+    {
+        "iruzo/ripgrep.nvim",
     },
 
     {
@@ -72,7 +72,6 @@ return {
         },
         config = function()
             local builtin = require('telescope.builtin')
-            -- Основные горячие клавиши
             vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Поиск файлов' })
             vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Поиск текста по всему проекту' }) -- need rg
             vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Список открытых табов' })
@@ -84,16 +83,14 @@ return {
         "folke/persistence.nvim",
         event = "BufReadPre",
         opts = { options = { "buffers", "curdir", "tabpages", "winsize" } },
-        -- Горячие клавиши для восстановления
         keys = {
-            { "<F9>", function() require("persistence").load() end, desc = "Restore Session" },
+            { "<leader>0", function() require("persistence").load() end, desc = "Restore Session" },
         },
     },
 
     {
         'mhinz/vim-startify',
         config = function()
-        -- Пример настройки через Lua
         vim.g.startify_lists = {
             { type = 'files',     header = {'   Recent Files'} },
             { type = 'dir',       header = {'   Current Directory ' .. vim.fn.getcwd()} },
@@ -102,11 +99,94 @@ return {
         }
         end
     },
-    
+
     {
         "williamboman/mason.nvim",
+        dependencies = {
+            "WhoIsSethDaniel/mason-tool-installer.nvim",
+        },
         config = function()
             require("mason").setup()
+        end,
+    },
+
+    {
+        "jay-babu/mason-null-ls.nvim",
+        config = function()
+            require("mason-null-ls").setup({
+                ensure_installed = { "clang_format", "black" },
+                automatic_setup = true,
+                handlers = {}
+            })
         end
+    },
+
+    {
+        "williamboman/mason-lspconfig.nvim",
+        opts = {
+            ensure_installed = { "clangd", "pyright" },
+        },
+    },
+
+    {
+        "nvimtools/none-ls.nvim",
+        config = function()
+            local null_ls = require("null-ls")
+            null_ls.setup({
+                sources = {
+                    null_ls.builtins.formatting.clang_format,
+                    null_ls.builtins.formatting.black,
+                },
+            })
+        end
+    },
+
+    {
+        "neovim/nvim-lspconfig",
+        dependencies = {
+            "hrsh7th/nvim-cmp",
+            "hrsh7th/cmp-nvim-lsp",
+        },
+        config = function()
+            local cmp_nvim_lsp = require("cmp_nvim_lsp")
+            local capabilities = cmp_nvim_lsp.default_capabilities()
+
+            local on_attach = function(client, bufnr)
+                local keymap = vim.keymap
+
+                -- Keybind options.
+                local opts = { silent = true, buffer = bufnr }
+
+                -- Set keymaps.
+
+                opts.desc = "Go to definition."
+                keymap.set("n", "<F12>", vim.lsp.buf.definition, opts)
+            end
+
+            vim.diagnostic.config({ virtual_text = true })
+
+            vim.lsp.config("*", {
+                capabilities = capabilities,
+                on_attach = on_attach,
+            })
+
+            vim.lsp.config("clangd", {
+                capabilities = capabilities,
+                on_attach = on_attach,
+                cmd = {
+                    "clangd",
+                    "--background-index",
+                    "--clang-tidy",
+                    "--header-insertion=never",
+                    "--log=info",
+                    "--pretty",
+                },
+                init_options = {
+                    fallbackFlags = {
+                        "-std=c++20",
+                    }
+                },
+            })
+        end,
     }
 }
