@@ -19,22 +19,6 @@ return {
     {
         "derekwyatt/vim-fswitch",
         config = function()
-            vim.api.nvim_create_autocmd("FileType", {
-                pattern = { "cpp", "c", "cc", "cxx" },
-                callback = function()
-                    vim.b.fswitchdst = "h,hpp,hh,hxx"
-                    vim.b.fswitchlocs = ".,../include,../inc,../../include,include"
-                end
-            })
-
-            vim.api.nvim_create_autocmd("FileType", {
-                pattern = { "h", "hpp", "hh" },
-                callback = function()
-                    vim.b.fswitchdst = "cpp,c,cc,cxx"
-                    vim.b.fswitchlocs = ".,../src,../../src,src"
-                end
-            })
-
             vim.keymap.set('n', '<C-h>', ':FSHere<CR>', { silent = true, desc = "Switch Source/Header" })
         end
     },
