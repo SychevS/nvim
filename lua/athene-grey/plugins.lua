@@ -180,6 +180,7 @@ return {
                     "--header-insertion=never",
                     "--log=info",
                     "--pretty",
+                    -- "--compile-commands-dir=",
                 },
                 init_options = {
                     fallbackFlags = {
@@ -187,6 +188,140 @@ return {
                     }
                 },
             })
+
+            local pyright_options = {
+                capabilities = capabilities,
+                on_attach = on_attach,
+
+                settings = {
+                    python = {
+                        analysis = {
+                            autoImportCompletions = true,
+                            autoSearchPaths = true,
+                            diagnosticMode = "openFilesOnly",
+                            useLibraryCodeForTypes = true,
+
+                            diagnosticSeverityOverrides = {
+                                analyzeUnannotatedFunctions = true,
+
+                                enableTypeIgnoreComments = true,
+
+                                strictDictionaryInference = true,
+                                strictListInference = true,
+                                strictParameterNoneValue = true,
+                                strictSetInference = true,
+
+                                reportAssertAlwaysTrue = "warning",
+                                reportCallInDefaultInitializer = "none",
+                                reportConstantRedefinition = "warning",
+                                reportDeprecated = "warning",
+                                reportDuplicateImport = "error",
+                                reportFunctionMemberAccess = "error",
+                                reportImplicitOverride = "none",
+                                reportImplicitStringConcatenation = "none",
+                                reportImportCycles = "warning",
+                                reportIncompatibleMethodOverride = "error",
+                                reportIncompatibleVariableOverride = "error",
+                                reportIncompleteStub = "none",
+                                reportInconsistentConstructor = "error",
+                                reportInvalidStringEscapeSequence = "error",
+                                reportInvalidStubStatement = "none",
+                                reportInvalidTypeVarUse = "error",
+                                reportMatchNotExhaustive = "error",
+                                reportMissingImports = "error",
+                                reportMissingModuleSource = "error",
+                                reportMissingSuperCall = "none",
+                                reportMissingTypeArgument = "none",
+                                reportMissingTypeStubs = "none",
+                                reportOptionalCall = "error",
+                                reportOptionalContextManager = "error",
+                                reportOptionalIterable = "error",
+                                reportOptionalMemberAccess = "error",
+                                reportOptionalOperand = "error",
+                                reportOptionalSubscript = "error",
+                                reportOverlappingOverload = "error",
+                                reportPrivateImportUsage = "none",
+                                reportPrivateUsage = "none",
+                                reportPropertyTypeMismatch = "warning",
+                                reportSelfClsParameterName = "error",
+                                reportShadowedImports = "warning",
+                                reportTypeCommentUsage = "error",
+                                reportTypedDictNotRequiredAccess = "error",
+                                reportUnboundVariable = "error",
+                                reportUndefinedVariable = "error",
+                                reportUnknownArgumentType = "none",
+                                reportUnknownLambdaType = "none",
+                                reportUnknownMemberType = "none",
+                                reportUnknownParameterType = "none",
+                                reportUnknownVariableType = "none",
+                                reportUnnecessaryCast = "warning",
+                                reportUnnecessaryComparison = "none",
+                                reportUnnecessaryContains = "warning",
+                                reportUnnecessaryIsInstance = "none",
+                                reportUnsupportedDunderAll = "warning",
+                                reportUntypedBaseClass = "warning",
+                                reportUntypedClassDecorator = "none",
+                                reportUntypedFunctionDecorator = "none",
+                                reportUntypedNamedTuple = "none",
+                                reportUnusedClass = "error",
+                                reportUnusedCoroutine = "error",
+                                reportUnusedExpression = "error",
+                                reportUnusedFunction = "error",
+                                reportUnusedImport = "error",
+                                reportUnusedVariable = "error",
+                                reportWildcardImportFromLibrary = "error",
+                            },
+                        },
+                    },
+                },
+            }
+
+            vim.lsp.config("pyright", pyright_options)
         end,
-    }
+    },
+
+    {
+        -- Completion plugin.
+        "hrsh7th/nvim-cmp",
+        event = "InsertEnter",
+        dependencies = {
+            -- Source for text in buffer.
+            "hrsh7th/cmp-buffer", -- source for text in buffer
+            -- Source for file system paths.
+            "hrsh7th/cmp-path",
+        },
+        config = function()
+            local cmp = require("cmp")
+
+            cmp.setup({
+                mapping = cmp.mapping.preset.insert({
+                    -- Previous suggestion.
+                    ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+                    -- Next suggestion.
+                    ["<Tab>"] = cmp.mapping.select_next_item(),
+                    -- Show completion suggestions.
+                    ["<C-Space>"] = cmp.mapping.complete(),
+                    -- Close completion window.
+                    ["<C-e>"] = cmp.mapping.abort(),
+
+                    -- Scroll.
+                    ["<C-k>"] = cmp.mapping.scroll_docs(-4),
+                    ["<C-j>"] = cmp.mapping.scroll_docs(4),
+
+                    -- Confirm by enter or tab.
+                    ["<CR>"] = cmp.mapping.confirm({ select = false }),
+                }),
+                -- Sources for autocompletion.
+                sources = cmp.config.sources({
+                    -- LSP.
+                    { name = "nvim_lsp" },
+                    -- Text within current buffer.
+                    { name = "buffer" },
+                    -- File system paths.
+                    { name = "path" },
+                }),
+            })
+        end,
+    },
+
 }
