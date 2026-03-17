@@ -50,7 +50,7 @@ return {
 
     {
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.8',
+        branch = 'master',
         dependencies = {
             'nvim-lua/plenary.nvim',
             { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
@@ -109,7 +109,11 @@ return {
     {
         "williamboman/mason-lspconfig.nvim",
         opts = {
-            ensure_installed = { "clangd", "pyright" },
+            ensure_installed = {
+                "clangd",
+                "pyright",
+                "lua_ls"
+            },
         },
     },
 
@@ -143,6 +147,15 @@ return {
                 local opts = { silent = true, buffer = bufnr }
 
                 -- Set keymaps.
+
+                opts.desc = "Show LSP references."
+                keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+
+                opts.desc = "Go to definition in new tab."
+                vim.keymap.set("n", "gt", "<cmd>tab split | lua vim.lsp.buf.definition()<CR>", opts)
+
+                opts.desc = "Go to definition in vertical split."
+                vim.keymap.set("n", "gv", "<cmd>vsplit | lua vim.lsp.buf.definition()<CR>", opts)
 
                 opts.desc = "Go to definition."
                 keymap.set("n", "<F12>", vim.lsp.buf.definition, opts)
@@ -262,6 +275,30 @@ return {
             }
 
             vim.lsp.config("pyright", pyright_options)
+
+            vim.lsp.config("lua_ls", {
+                capabilities = capabilities,
+                on_attach = on_attach,
+
+                settings = {
+                    Lua = {
+                        -- Make the language server recognize "vim" and "os" globals.
+                        diagnostics = {
+                            globals = {
+                                "vim",
+                                "os",
+                            },
+                        },
+                        workspace = {
+                            -- Make language server aware of runtime files.
+                            library = {
+                                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                                [vim.fn.stdpath("config") .. "/lua"] = true,
+                            },
+                        },
+                    },
+                },
+            })
         end,
     },
 
@@ -305,6 +342,30 @@ return {
                     -- File system paths.
                     { name = "path" },
                 }),
+            })
+        end,
+    },
+
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate", -- Автоматически обновляет парсеры при обновлении плагина
+        config = function()
+            require("nvim-treesitter").setup({
+                ensure_installed = {
+                    "c",
+                    "cpp",
+                    "python",
+                    "lua",
+                    "vim",
+                    "vimdoc"
+                },
+                auto_install = true,
+                highlight = {
+                    enable = true,
+                },
+                indent = {
+                    enable = true,
+                },
             })
         end,
     },
