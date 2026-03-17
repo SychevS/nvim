@@ -51,7 +51,7 @@ return {
     {
         'nvim-telescope/telescope.nvim',
         tag = '0.1.8',
-        dependencies = { 
+        dependencies = {
             'nvim-lua/plenary.nvim',
             { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
         },
@@ -69,8 +69,9 @@ return {
         event = "BufReadPre",
         opts = { options = { "buffers", "curdir", "tabpages", "winsize" } },
         keys = {
-            { "<leader>0", function() require("persistence").load() end, desc = "Restore Session" },
+            { "<leader>0", function() require("persistence").load({last = true}) end, desc = "Restore Session" },
         },
+        nested = true
     },
 
     {
