@@ -71,7 +71,6 @@ return {
         keys = {
             { "<leader>0", function() require("persistence").load({last = true}) end, desc = "Restore Session" },
         },
-        nested = true
     },
 
     {
