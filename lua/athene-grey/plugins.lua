@@ -155,10 +155,6 @@ return {
                 on_attach = on_attach,
             })
 
-            -- yandex compile commands
-            -- ya make -r --add-result=".h" --add-result=".hh" --add-result=".hpp" --add-result=".c" --add-result=".cc" --add-result=".cpp" --add-result=.pb.h --add-result=.pb.cc --add-result=.fbs64.h --replace-result .
-            -- ya dump compile-commands -r --force-build-depends . > compile_commands.json
-
             vim.lsp.config("clangd", {
                 capabilities = capabilities,
                 on_attach = on_attach,
