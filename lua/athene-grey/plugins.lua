@@ -99,7 +99,11 @@ return {
         "jay-babu/mason-null-ls.nvim",
         config = function()
             require("mason-null-ls").setup({
-                ensure_installed = { "clang_format", "black" },
+                ensure_installed = {
+                    "clang_format",
+                    "black",
+                    "stylua"
+                },
                 automatic_setup = true,
                 handlers = {}
             })
@@ -125,6 +129,7 @@ return {
                 sources = {
                     null_ls.builtins.formatting.clang_format,
                     null_ls.builtins.formatting.black,
+                    null_ls.builtins.formatting.stylua,
                 },
             })
         end
@@ -159,6 +164,9 @@ return {
 
                 opts.desc = "Go to definition."
                 keymap.set("n", "<F12>", vim.lsp.buf.definition, opts)
+
+                opts.desc = "Restart LSP."
+                keymap.set("n", "<leader>rs", "<cmd>LspRestart<CR>", opts)
             end
 
             vim.diagnostic.config({ virtual_text = true })
@@ -291,10 +299,7 @@ return {
                         },
                         workspace = {
                             -- Make language server aware of runtime files.
-                            library = {
-                                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                                [vim.fn.stdpath("config") .. "/lua"] = true,
-                            },
+                            library = { vim.env.VIMRUNTIME },
                         },
                     },
                 },
@@ -350,14 +355,52 @@ return {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate", -- Автоматически обновляет парсеры при обновлении плагина
         config = function()
-            require("nvim-treesitter").setup({
+            local treesitter = require("nvim-treesitter")
+
+            treesitter.setup({
+                parser_install_dir = "~/.local/share/nvim/site",
+
                 ensure_installed = {
                     "c",
                     "cpp",
+
                     "python",
+
+                    "go",
+                    "gosum",
+                    "gomod",
+
+                    "rust",
+
                     "lua",
+
+                    "java",
+                    "kotlin",
+
+                    "proto",
+
+                    "bash",
+
+                    "json",
+                    "yaml",
+
+                    "latex",
+                    "markdown",
+                    "markdown_inline",
+
                     "vim",
-                    "vimdoc"
+                    "dockerfile",
+                    "gitignore",
+
+                    "javascript",
+                    "typescript",
+                    "tsx",
+                    "html",
+                    "css",
+                    "prisma",
+                    "svelte",
+                    "graphql",
+                    "query",
                 },
                 auto_install = true,
                 highlight = {
@@ -370,4 +413,48 @@ return {
         end,
     },
 
+    {
+        "yetone/avante.nvim",
+        -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+        -- ⚠️ must add this setting! ! !
+        build = vim.fn.has("win32") ~= 0
+            and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+            or "make",
+        event = "VeryLazy",
+        version = false, -- Never set this value to "*"! Never!
+        ---@module 'avante'
+        ---@type avante.Config
+        opts = {
+            -- add any opts here
+            -- this file can contain specific instructions for your project
+            -- instructions_file = "avante.md",
+            providers = {
+                yaopenai = {
+                    __inherited_from = "openai",
+                    api_key_name = "cmd:cat ~/.config/eliza_api_key",
+                    endpoint = "https://api.eliza.yandex.net/openai/v1",
+                    model = "gpt-4.1",
+                },
+            },
+            provider = "yaopenai",
+            input = {
+                provider = "native"
+            }
+        },
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+            --- The below dependencies are optional,
+            "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
+            "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+            {
+                -- Make sure to set this up properly if you have lazy=true
+                "MeanderingProgrammer/render-markdown.nvim",
+                opts = {
+                    file_types = { "markdown", "Avante" },
+                },
+                ft = { "markdown", "Avante" },
+            },
+        },
+    },
 }
