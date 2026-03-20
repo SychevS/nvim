@@ -433,7 +433,7 @@ return {
                     __inherited_from = "openai",
                     api_key_name = "cmd:cat ~/.config/eliza_api_key",
                     endpoint = "https://api.eliza.yandex.net/openai/v1",
-                    model = "gpt-5.4",
+                    model = "gpt-5.2",
                 },
                 anthropic = {
                     __inherited_from = "openai",
@@ -442,7 +442,7 @@ return {
                     model = "claude-sonnet-4-6",
                 },
             },
-            provider = "anthropic",
+            provider = "openai",
             input = {
                 provider = "native"
             }
