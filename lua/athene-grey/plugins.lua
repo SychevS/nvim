@@ -443,9 +443,22 @@ return {
                 },
             },
             provider = "openai",
+            -- auto_suggestions_provider = "anthropic",
             input = {
                 provider = "native"
-            }
+            },
+            behaviour = {
+                auto_suggestions = false,
+                auto_suggestions_respect_ignore = false,
+            },
+            mappings = {
+                suggestion = {
+                    accept = "<C-y>",
+                    next = "<C-j",
+                    prev = "<C-k>",
+                    dismiss = "<C-n>",
+                },
+            },
         },
         dependencies = {
             "nvim-lua/plenary.nvim",
